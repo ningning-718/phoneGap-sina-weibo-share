@@ -1,6 +1,6 @@
 var WeiboShare = function() {};
 
-WechatShare.prototype.share = function(options, success, fail) {
+WeiboShare.prototype.share = function(options, success, fail) {
   cordova.exec(function(result) {
     success(result);
   }, function() {
@@ -8,5 +8,5 @@ WechatShare.prototype.share = function(options, success, fail) {
   }, "WeiboShare", "share", [options]);
 };
 
-var wechatShare = new WechatShare();
-module.exports = wechatShare;
+var weiboShare = new WeiboShare();
+module.exports = weiboShare;
