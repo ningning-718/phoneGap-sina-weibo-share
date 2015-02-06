@@ -25,7 +25,7 @@
       <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
       <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     </config-file>
-   <!--  <config-file target="AndroidManifest.xml" parent="/application">
+    <config-file target="AndroidManifest.xml" parent="/application">
       <activity android:name="com.sina.weibo.sdk.component.WeiboSdkBrowser" 
             android:configChanges="keyboardHidden|orientation"
             android:windowSoftInputMode="adjustResize"
@@ -34,7 +34,7 @@
       <service android:name="com.sina.weibo.sdk.net.DownloadService"
             android:exported="false">
       </service>
-    </config-file> -->
+    </config-file>
 
     <source-file src="src/android/libs/weibosdkcore.jar" target-dir="libs"/>
     <source-file src="src/android/libs/armeabi/libweibosdkcore.so" target-dir="libs/armeabi"/>
