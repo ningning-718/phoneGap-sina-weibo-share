@@ -2,7 +2,7 @@
 
 ## Using the plugin
 
-Example -share to moment
+Example
 ```javascript
 WeiboShare.share({
     "title": "title",
