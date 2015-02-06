@@ -183,7 +183,7 @@ public class WeiboShare extends CordovaPlugin {
 				try {
 					url = new URL(image_url);
 					thumb = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-					thumb = centerSquareScaleBitmap(thumb, 400);
+					thumb = centerSquareScaleBitmap(thumb, 200);
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
