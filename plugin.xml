@@ -19,11 +19,22 @@
       </feature>
     </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest">
-      <uses-permission android:name="android.permission.INTERNET"/>
-      <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/> 
-      <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/> 
-      <uses-permission android:name="android.permission.READ_PHONE_STATE"/> 
-      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+      <uses-permission android:name="android.permission.INTERNET" />
+      <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+      <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+      <!-- 用于调用 JNI -->
+      <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/application">
+      <activity android:name="com.sina.weibo.sdk.component.WeiboSdkBrowser" 
+            android:configChanges="keyboardHidden|orientation"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" >
+      </activity>
+      <service android:name="com.sina.weibo.sdk.net.DownloadService"
+            android:exported="false">
+      </service>
     </config-file>
 
     <source-file src="src/android/libs/weibosdkcore.jar" target-dir="libs"/>
