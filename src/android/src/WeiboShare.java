@@ -17,6 +17,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.sina.weibo.sdk.api.ImageObject;
 import com.sina.weibo.sdk.api.TextObject;
@@ -38,7 +43,6 @@ public class WeiboShare extends CordovaPlugin {
 	private String summary;
 	private String target_url;
 	private String image_url;
-	private static int scene = 0;
 
 	/** 微博分享的接口实例 */
 	private IWeiboShareAPI mWeiboShareAPI;
@@ -54,32 +58,27 @@ public class WeiboShare extends CordovaPlugin {
 		target_url = jsonObject.getString("target_url");
 		image_url = jsonObject.getString("image_url");
 
-		final JSONObject result = new JSONObject();
-		result.put("result", true);
 		final Context context = this.cordova.getActivity().getApplicationContext();
 		final Activity activity = this.cordova.getActivity();
+
+		final JSONObject result = new JSONObject();
+		result.put("result", true);
 
 		Runnable runable = new Runnable() {
 			Bitmap thumb = null;
 
 			@Override
 			public void run() {
+				show();
 				mWeiboShareAPI = WeiboShareSDK.createWeiboAPI(context, Constants.APP_KEY);
-
 				// 获取微博客户端相关信息，如是否安装、支持 SDK 的版本
-				boolean isInstalledWeibo = mWeiboShareAPI.isWeiboAppInstalled();
-				int supportApiLevel = mWeiboShareAPI.getWeiboAppSupportAPI();
-
 				mWeiboShareAPI.registerApp();
-
 				sendMultiMessage();
 			}
 
 			/**
-			 * 第三方应用发送请求消息到微博，唤起微博分享界面。 注意：当
-			 * {@link IWeiboShareAPI#getWeiboAppSupportAPI()} >= 10351
-			 * 时，支持同时分享多条消息， 同时可以分享文本、图片以及其它媒体资源（网页、音乐、视频、声音中的一种）。
-			 * */
+			* 第三方应用发送请求消息到微博，唤起微博分享界面。 注意：当 {@link IWeiboShareAPI#getWeiboAppSupportAPI()} >= 10351 时，支持同时分享多条消息， 同时可以分享文本、图片以及其它媒体资源（网页、音乐、视频、声音中的一种）。
+			* */
 			private void sendMultiMessage() {
 
 				// 1. 初始化微博的分享消息
@@ -111,6 +110,7 @@ public class WeiboShare extends CordovaPlugin {
 					@Override
 					public void onWeiboException(WeiboException arg0) {
 						arg0.printStackTrace();
+						Log.d("weibo", "onWeiboException");
 					}
 
 					@Override
@@ -118,20 +118,58 @@ public class WeiboShare extends CordovaPlugin {
 						// TODO Auto-generated method stub
 						Oauth2AccessToken newToken = Oauth2AccessToken.parseAccessToken(bundle);
 						AccessTokenKeeper.writeAccessToken(context.getApplicationContext(), newToken);
+						Log.d("weibo", "onComplete");
 					}
 
 					@Override
 					public void onCancel() {
+						Log.d("weibo", "onCancel");
+					}
+
+				});
+				hidden();
+			}
+
+			private void hidden() {
+				cordova.getActivity().runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						ViewGroup root = (ViewGroup) activity.getWindow().getDecorView().findViewById(android.R.id.content);
+						root.removeViewAt(1);
 					}
 				});
+			}
 
+			private void show() {
+				cordova.getActivity().runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						ViewGroup root = (ViewGroup) activity.getWindow().getDecorView().findViewById(android.R.id.content);
+
+						RelativeLayout rl = new RelativeLayout(activity);
+						rl.setBackgroundColor(0x90000000);
+						RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+						params.addRule(RelativeLayout.CENTER_IN_PARENT);
+						rl.setLayoutParams(params);
+						root.addView(rl);
+
+						ProgressBar dlg = new ProgressBar(activity);
+						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+						p.addRule(RelativeLayout.CENTER_IN_PARENT);
+						dlg.setLayoutParams(p);
+						rl.addView(dlg);
+
+					}
+				});
 			}
 
 			/**
-			 * 创建文本消息对象。
-			 * 
-			 * @return 文本消息对象。
-			 */
+			* 创建文本消息对象。
+			*
+			* @return 文本消息对象。
+			*/
 			private TextObject getTextObj() {
 				TextObject textObject = new TextObject();
 				textObject.text = summary;
@@ -139,10 +177,10 @@ public class WeiboShare extends CordovaPlugin {
 			}
 
 			/**
-			 * 创建图片消息对象。
-			 * 
-			 * @return 图片消息对象。
-			 */
+			* 创建图片消息对象。
+			*
+			* @return 图片消息对象。
+			*/
 			private ImageObject getImageObj() {
 				Bitmap b = getThumbBitmap();
 				if (b == null) {
@@ -154,10 +192,10 @@ public class WeiboShare extends CordovaPlugin {
 			}
 
 			/**
-			 * 创建多媒体（网页）消息对象。
-			 * 
-			 * @return 多媒体（网页）消息对象。
-			 */
+			* 创建多媒体（网页）消息对象。
+			*
+			* @return 多媒体（网页）消息对象。
+			*/
 			private WebpageObject getWebpageObj() {
 				WebpageObject mediaObject = new WebpageObject();
 				mediaObject.identify = Utility.generateGUID();
@@ -194,13 +232,13 @@ public class WeiboShare extends CordovaPlugin {
 			}
 
 			/**
-			 * 
-			 * @param bitmap
-			 *            原图
-			 * @param edgeLength
-			 *            希望得到的正方形部分的边长
-			 * @return 缩放截取正中部分后的位图。
-			 */
+			*
+			* @param bitmap
+			*            原图
+			* @param edgeLength
+			*            希望得到的正方形部分的边长
+			* @return 缩放截取正中部分后的位图。
+			*/
 			public Bitmap centerSquareScaleBitmap(Bitmap bitmap, int edgeLength) {
 				if (null == bitmap || edgeLength <= 0) {
 					return null;
