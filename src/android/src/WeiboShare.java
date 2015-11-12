@@ -10,7 +10,7 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.travelers.together.R;
+import org.storebbs.together.R;
 
 import android.app.Activity;
 import android.content.Context;
